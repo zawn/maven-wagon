@@ -19,7 +19,7 @@ package org.apache.maven.wagon.shared.http;
  * under the License.
  */
 
-import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URI;
