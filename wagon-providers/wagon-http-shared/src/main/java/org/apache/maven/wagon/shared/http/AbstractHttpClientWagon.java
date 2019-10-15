@@ -739,24 +739,35 @@ public abstract class AbstractHttpClientWagon
                     case HttpStatus.SC_MOVED_PERMANENTLY: // 301
                     case HttpStatus.SC_MOVED_TEMPORARILY: // 302
                     case HttpStatus.SC_SEE_OTHER: // 303
+                    case HttpStatus.SC_TEMPORARY_REDIRECT: // 307
+                        EntityUtils.consume( response.getEntity() );
+                        firePutCompleted( resource, source );
                         put( resource, source, httpEntity, calculateRelocatedUrl( response ) );
                         return;
                     case HttpStatus.SC_FORBIDDEN:
+                        EntityUtils.consume( response.getEntity() );
                         fireSessionConnectionRefused();
                         throw new AuthorizationException( "Access denied to: " + url );
 
                     case HttpStatus.SC_NOT_FOUND:
-                        throw new ResourceDoesNotExistException( "File " + url + " does not exist" );
+                        EntityUtils.consume( response.getEntity() );
+                        ResourceDoesNotExistException rdnee = new ResourceDoesNotExistException(
+                            "File " + url + " does not exist" );
+                        fireTransferError( resource, rdnee, TransferEvent.REQUEST_PUT );
+                        throw rdnee;
 
                     case SC_TOO_MANY_REQUESTS:
+                        EntityUtils.consume( response.getEntity() );
+                        firePutCompleted( resource, source );
                         put( backoff( wait, url ), resource, source, httpEntity, url );
-                        break;
+                        return;
                     //add more entries here
                     default:
-                        TransferFailedException e = new TransferFailedException(
+                        EntityUtils.consume( response.getEntity() );
+                        TransferFailedException tfe = new TransferFailedException(
                             "Failed to transfer file " + url + " with status code " + statusCode );
-                        fireTransferError( resource, e, TransferEvent.REQUEST_PUT );
-                        throw e;
+                        fireTransferError( resource, tfe, TransferEvent.REQUEST_PUT );
+                        throw tfe;
                 }
 
                 firePutCompleted( resource, source );
