@@ -742,7 +742,21 @@ public abstract class AbstractHttpClientWagon
                     case HttpStatus.SC_TEMPORARY_REDIRECT: // 307
                         EntityUtils.consume( response.getEntity() );
                         firePutCompleted( resource, source );
-                        put( resource, source, httpEntity, calculateRelocatedUrl( response ) );
+                        String relocatedUrl = calculateRelocatedUrl( response );
+                        System.out.printf("Redirecting resource '%s' to '%s'; entity.repeatable=%s'", resource, resource, httpEntity.isRepeatable() );
+                        if ( source == null )
+                        {
+                            try
+                            {
+                                InputStream is = httpEntity.getContent();
+                                System.out.printf( ", is.type=%s, is.available=%s%n", is.getClass().getSimpleName(), is.available() );
+                            }
+                            catch ( Exception e )
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        put( resource, source, httpEntity, relocatedUrl );
                         return;
                     case HttpStatus.SC_FORBIDDEN:
                         EntityUtils.consume( response.getEntity() );
