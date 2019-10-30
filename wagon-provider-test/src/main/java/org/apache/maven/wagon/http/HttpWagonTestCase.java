@@ -62,6 +62,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -907,9 +908,10 @@ public abstract class HttpWagonTestCase
             String content = "put top secret";
             FileUtils.fileWrite( tempFile.getAbsolutePath(), content );
 
-            try ( FileInputStream fileInputStream = new FileInputStream( tempFile ) )
+            //try ( FileInputStream fileInputStream = new FileInputStream( tempFile ) )
+            try ( InputStream inputStream = new ByteArrayInputStream( content.getBytes() ) )
             {
-                wagon.putFromStream( fileInputStream, "test-secured-put-resource", content.length(), -1 );
+                wagon.putFromStream( inputStream, "test-secured-put-resource", content.length(), -1 );
                 assertEquals( content, FileUtils.fileRead( sourceFile.getAbsolutePath() ) );
 
                 checkRequestResponseForRedirectPutWithFullUrl( redirectHandler, putHandler );

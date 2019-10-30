@@ -954,7 +954,7 @@ public abstract class AbstractHttpClientWagon
             requestConfigBuilder.setSocketTimeout( getReadTimeout() );
             if ( httpMethod instanceof HttpPut )
             {
-                requestConfigBuilder.setExpectContinueEnabled( true );
+                requestConfigBuilder.setExpectContinueEnabled( false );
             }
         }
 
