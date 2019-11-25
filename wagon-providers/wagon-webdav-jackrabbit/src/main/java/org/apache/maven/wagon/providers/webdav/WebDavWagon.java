@@ -161,19 +161,25 @@ public class WebDavWagon
 
         // traverse backwards until we hit a directory that already exists (OK/NOT_ALLOWED), or that we were able to
         // create (CREATED), or until we get to the top of the path
-        int status = -1;
         do
         {
             String url = baseUrl + "/" + navigator.getPath();
-            status = doMkCol( url );
-            if ( status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED
-                || status == HttpStatus.SC_METHOD_NOT_ALLOWED )
+            try
             {
-                break;
+                boolean isDir = isDirectory( url );
+                if ( isDir )
+                {
+                    break;
+                }
+            }
+            catch ( DavException e )
+            {
+                e.printStackTrace();
             }
         }
         while ( navigator.backward() );
 
+        int status = -1;
         // traverse forward creating missing directories
         while ( navigator.forward() )
         {
