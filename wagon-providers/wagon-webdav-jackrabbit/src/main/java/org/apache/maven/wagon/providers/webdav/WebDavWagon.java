@@ -126,7 +126,12 @@ public class WebDavWagon
     @Override
     protected String getUserAgent( HttpUriRequest method )
     {
-        String userAgent = super.getUserAgent( method );
+        String userAgent = System.getProperty( "http.agent" );
+        if ( userAgent != null )
+        {
+            return userAgent;
+        }
+        userAgent = super.getUserAgent( method );
         if ( userAgent == null )
         {
             return DEFAULT_USER_AGENT;
