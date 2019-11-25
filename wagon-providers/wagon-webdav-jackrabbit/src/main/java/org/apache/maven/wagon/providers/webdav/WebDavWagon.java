@@ -24,6 +24,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.jackrabbit.webdav.DavConstants;
@@ -137,6 +138,17 @@ public class WebDavWagon
             return DEFAULT_USER_AGENT;
         }
         return userAgent;
+    }
+
+    @Override
+    protected CloseableHttpResponse execute( HttpUriRequest httpMethod ) throws HttpException, IOException
+    {
+        CloseableHttpResponse response = super.execute( httpMethod );
+        if ( httpMethod instanceof HttpGet && response.getStatusLine().getStatusCode() == HttpStatus.SC_CONFLICT )
+        {
+            response.setStatusCode( HttpStatus.SC_NOT_FOUND );
+        }
+        return response;
     }
 
     /**
